@@ -1,0 +1,14 @@
+.cache
+.pytest_cache
+.DS_Store
+.tox
+.envrc
+.vscode
+dist
+.pyo
+build
+.coverage*
+.mypy_cache
+.htmlcov
+*.pyc
+.direnv
