@@ -18,6 +18,7 @@ class FrameDetail:
   function: str
   lineno: int | None
   line: str | None
+  locals: dict[str, str] | None
 
 
 class FrameExtractor(Extractor):
@@ -26,7 +27,8 @@ class FrameExtractor(Extractor):
       filename=raw_data.filename,
       function=raw_data.name,
       lineno=raw_data.lineno,
-      line=raw_data.line
+      line=raw_data.line,
+      locals=raw_data.locals,
     )
 
 
@@ -56,7 +58,7 @@ class ExceptionCallbackImpl(BaseExceptionCallbackImpl):
     python_lib_paths = sys.prefix, sys.base_prefix
     frame_extractor = FrameExtractor()
 
-    for frame in frames:
+    for frame in frames.extract(traceback.walk_tb(exc_traceback), capture_locals=True):
       has_lib_path = next((True for lib_path in python_lib_paths if frame.filename.startswith(lib_path)), False)
 
       if has_lib_path:
