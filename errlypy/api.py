@@ -16,7 +16,7 @@ class ExceptionCallback(ABC):
         self,
         exc_type: Type[BaseException],
         exc_value: BaseException,
-        exc_traceback: TracebackType | None,
+        exc_traceback: Optional[TracebackType],
     ):
         pass
 

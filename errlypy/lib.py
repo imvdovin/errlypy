@@ -2,7 +2,7 @@ import sys
 import traceback
 from dataclasses import dataclass
 from types import TracebackType
-from typing import Type, cast, Any
+from typing import Type, cast, Any, Optional
 from errlypy.api import ExceptionCallback, ExceptionCallbackWithContext, Extractor
 from errlypy.utils import has_contract_been_implemented
 from errlypy.stack import StackSummaryWrapper
@@ -17,9 +17,9 @@ class CreateExceptionCallbackMeta:
 class FrameDetail:
     filename: str
     function: str
-    lineno: int | None
-    line: str | None
-    locals: dict[str, str] | None
+    lineno: Optional[int]
+    line: Optional[str]
+    locals: Optional[dict[str, str]]
 
 
 class FrameExtractor(Extractor):
@@ -56,7 +56,7 @@ class ExceptionCallbackImpl(BaseExceptionCallbackImpl):
         self,
         exc_type: Type[BaseException],
         exc_value: BaseException,
-        exc_traceback: TracebackType | None,
+        exc_traceback: Optional[TracebackType],
     ):
         # TODO: Create dataclass for response
         response: dict[str, Any] = {
