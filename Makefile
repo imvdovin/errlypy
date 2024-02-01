@@ -9,3 +9,6 @@ ruff:
 
 mypy:
 	poetry run mypy .
+
+archunit:
+	poetry run wily build errlypy/
