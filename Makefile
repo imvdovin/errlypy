@@ -10,5 +10,5 @@ ruff:
 mypy:
 	poetry run mypy .
 
-archunit:
-	poetry run wily build errlypy/
+wily:
+	poetry run wily $(filter-out wily,$(MAKECMDGOALS))

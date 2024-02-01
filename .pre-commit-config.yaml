@@ -15,3 +15,11 @@ repos:
     rev: 24.1.1
     hooks:
       - id: black
+  - repo: local
+    hooks:
+      - id: wily
+        name: wily
+        entry: wily diff
+        verbose: true
+        language: python
+        additional_dependencies: [wily]
