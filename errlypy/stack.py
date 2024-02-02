@@ -5,7 +5,7 @@ import collections
 import sys
 
 
-class StackSummaryWrapper(list):
+class StackSummaryWrapper(traceback.StackSummary):
     @classmethod
     def extract(
         klass, frame_gen, *, limit=None, lookup_lines=True, capture_locals=True
