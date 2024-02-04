@@ -57,9 +57,6 @@ class StackSummaryWrapper(traceback.StackSummary):
                     name,
                     lookup_line=False,
                     locals=f_locals,
-                    end_lineno=end_lineno,
-                    colno=colno,
-                    end_colno=end_colno,
                 )
             except Exception:
                 continue

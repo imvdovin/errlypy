@@ -66,10 +66,11 @@ class ExceptionCallbackImpl(BaseExceptionCallbackImpl):
         frame_extractor = FrameExtractor()
 
         stack_summary_wrapper = StackSummaryWrapper()
-
-        for frame in stack_summary_wrapper.extract(
+        frames = stack_summary_wrapper.extract(
             traceback.walk_tb(exc_traceback), capture_locals=True
-        ):
+        )
+
+        for frame in frames:
             has_lib_path = next(
                 (
                     True

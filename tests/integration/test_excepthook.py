@@ -42,7 +42,7 @@ def test_exception_callback_impl_contract_fail():
 
 def test_exception_callback_impl_result_success():
     mpatch = MonkeyPatch()
-    callback = ExceptionCallbackImpl.create({}, CreateExceptionCallbackMeta())
+    callback = ExceptionCallbackImpl.create()
     mpatch.setattr(sys, "excepthook", callback)
 
     try:
