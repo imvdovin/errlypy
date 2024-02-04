@@ -55,7 +55,7 @@ async def test_exception_callback_impl_result_frame_detail_body_success():
         == "test_exception_callback_impl_result_frame_detail_body_success"
     )
     assert frame_detail.line == 'raise ValueError("Test")'
-    assert frame_detail.filename.endswith("test_lib_async.py") is True
+    assert frame_detail.filename.endswith("test_async_excepthook.py") is True
     assert "pytest.monkeypatch.MonkeyPatch object at" in frame_detail.locals["mpatch"]
     assert (
         "errlypy.lib.ExceptionCallbackImpl object at" in frame_detail.locals["callback"]

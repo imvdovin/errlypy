@@ -38,7 +38,7 @@ class BaseExceptionCallbackImpl(ExceptionCallback):
 
     @classmethod
     def create(
-        cls, context: dict[str, Any], meta: CreateExceptionCallbackMeta
+        cls, context: dict[str, Any] = dict(), meta=CreateExceptionCallbackMeta()
     ) -> "BaseExceptionCallbackImpl":
         instance = cls()
         instance._context = context
@@ -97,6 +97,3 @@ class ExceptionCallbackImpl(BaseExceptionCallbackImpl):
             self._next_callback.set_context(response)
 
         self._next_callback(exc_type, exc_value, exc_traceback)
-
-
-sys.excepthook = ExceptionCallbackImpl()

@@ -12,3 +12,6 @@ mypy:
 
 wily:
 	poetry run wily $(filter-out wily,$(MAKECMDGOALS))
+
+test:
+	poetry run pytest .
