@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
+from collections import OrderedDict
 from types import TracebackType
-from typing import Type, Any, Optional
+from typing import Any, Optional, Type
 
 
 class ExceptionCallback(ABC):
     _next_callback: Optional["ExceptionCallback"] = None
-    _dry_mode: bool = False
 
     @abstractmethod
     def set_next(self, callback: "ExceptionCallback") -> "ExceptionCallback":
@@ -30,4 +30,35 @@ class ExceptionCallbackWithContext(ExceptionCallback):
 class Extractor(ABC):
     @abstractmethod
     def extract(self, raw_data: Any) -> Any:
+        pass
+
+
+class IntegrationPlugin(ABC):
+    @abstractmethod
+    def setup(self) -> None:
+        pass
+
+    @abstractmethod
+    def revert(self) -> None:
+        pass
+
+    @abstractmethod
+    def __call__(self, *args, **kwargs):
+        pass
+
+
+class Integration(ABC):
+    _registry: OrderedDict[type, IntegrationPlugin]
+    _has_setup_been_called: bool
+
+    @abstractmethod
+    def register(self, *args) -> None:
+        pass
+
+    @abstractmethod
+    def setup(self) -> None:
+        pass
+
+    @abstractmethod
+    def revert(self) -> None:
         pass

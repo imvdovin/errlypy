@@ -5,9 +5,18 @@ description = ""
 authors = ["Evgeniy Vdovin <enjoyintheheat@gmail.com>"]
 readme = "README.md"
 
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+line_length = 100
+lines_between_sections = 1
+
 [tool.poetry.dependencies]
 python = "^3.9"
 django = "^4.2"
+aiohttp = "^3.9.3"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -19,6 +28,7 @@ black = "^24.1.1"
 pytest-asyncio = "^0.23.4"
 wily = "^1.25.0"
 types-mock = "^5.1.0.20240106"
+isort = "^5.13.2"
 
 [build-system]
 requires = ["poetry-core"]

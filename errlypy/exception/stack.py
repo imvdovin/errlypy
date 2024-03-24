@@ -1,18 +1,16 @@
-import traceback
+import collections
 import itertools
 import linecache
-import collections
 import sys
+import traceback
 
 
 class StackSummaryWrapper(traceback.StackSummary):
     @classmethod
-    def extract(
-        klass, frame_gen, *, limit=None, lookup_lines=True, capture_locals=True
-    ):
+    def extract(klass, frame_gen, *, limit=None, lookup_lines=True, capture_locals=True):
         def extended_frame_gen():
             for f, lineno in frame_gen:
-                yield f, (lineno, None, None, None)
+                yield f, lineno
 
         return klass._extract_from_extended_frame_gen(
             extended_frame_gen(),
@@ -37,7 +35,7 @@ class StackSummaryWrapper(traceback.StackSummary):
 
         result = klass()
         fnames = set()
-        for f, (lineno, end_lineno, colno, end_colno) in frame_gen:
+        for f, lineno in frame_gen:
             co = f.f_code
             filename = co.co_filename
             name = co.co_name

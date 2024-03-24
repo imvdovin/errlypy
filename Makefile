@@ -15,3 +15,6 @@ wily:
 
 test:
 	poetry run pytest
+
+sort:
+	poetry run isort --atomic .

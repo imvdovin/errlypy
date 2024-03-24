@@ -1,9 +1,7 @@
-from unittest.mock import patch
-from errlypy.integrations.api import IntegrationPlugin
-from errlypy.integrations.integration import (
-    IntegrationImpl,
-    get_integration_impl_singleton,
-)
+from unittest.mock import MagicMock, patch
+
+from errlypy.api import IntegrationPlugin
+from errlypy.lib import Errly, IntegrationImpl, get_integration_impl_singleton
 
 
 class TestIntegrationPluginImpl(IntegrationPlugin):
@@ -187,3 +185,11 @@ def test_integration_revert_plugins_twice():
 
         assert wrapped_revert_first.call_count == 1
         assert wrapped_revert_second.call_count == 1
+
+
+def test_errly_init():
+    integration_mock = MagicMock()
+    Errly.init(integration=integration_mock, plugins=[])
+
+    assert integration_mock.register.call_count == 1
+    assert integration_mock.setup.call_count == 1

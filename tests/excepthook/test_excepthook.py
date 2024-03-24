@@ -1,14 +1,17 @@
 import sys
-from dataclasses import asdict
-from pytest import MonkeyPatch
 from abc import ABC, abstractmethod
-from typing import cast, NoReturn
+from dataclasses import asdict
+from typing import NoReturn, cast
+
+from pytest import MonkeyPatch
+
 from errlypy.api import ExceptionCallback
-from errlypy.lib import ExceptionCallbackImpl, CreateExceptionCallbackMeta, FrameDetail
-from errlypy.utils import (
-    has_contract_been_implemented,
-    has_dict_contract_been_implemented,
+from errlypy.exception.callback import (
+    CreateExceptionCallbackMeta,
+    ExceptionCallbackImpl,
+    FrameDetail,
 )
+from errlypy.utils import has_contract_been_implemented, has_dict_contract_been_implemented
 
 
 class UncaughtExceptionFromRepr(Exception):
@@ -81,23 +84,19 @@ def test_exception_callback_impl_result_frame_detail_body_success():
         result = sys.excepthook(type(err), err, err.__traceback__)
 
     frame_detail = cast(FrameDetail, result["data"][0])
-    assert (
-        frame_detail.function
-        == "test_exception_callback_impl_result_frame_detail_body_success"
-    )
+    assert frame_detail.function == "test_exception_callback_impl_result_frame_detail_body_success"
     assert frame_detail.line == 'raise ValueError("Test")'
     assert frame_detail.filename.endswith("test_excepthook.py") is True
     assert "pytest.monkeypatch.MonkeyPatch object at" in frame_detail.locals["mpatch"]
     assert (
-        "errlypy.lib.ExceptionCallbackImpl object at" in frame_detail.locals["callback"]
+        "errlypy.exception.callback.ExceptionCallbackImpl object at"
+        in frame_detail.locals["callback"]
     )
 
 
 def test_exception_callback_impl_with_invalid_repr_result_frame_detail_body_success():
     mpatch = MonkeyPatch()
-    callback = ExceptionCallbackImplWithInvalidRepr.create(
-        {}, CreateExceptionCallbackMeta()
-    )
+    callback = ExceptionCallbackImplWithInvalidRepr.create({}, CreateExceptionCallbackMeta())
     mpatch.setattr(sys, "excepthook", callback)
 
     try:

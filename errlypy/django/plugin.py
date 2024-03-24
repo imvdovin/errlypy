@@ -1,8 +1,10 @@
-from typing import Any
 from types import TracebackType
+from typing import Any
+
 from django.core.handlers import exception
-from errlypy.lib import ExceptionCallbackImpl
-from errlypy.integrations.api import IntegrationPlugin
+
+from errlypy.api import IntegrationPlugin
+from errlypy.exception.callback import ExceptionCallbackImpl
 
 
 class DjangoIntegrationPlugin(IntegrationPlugin):

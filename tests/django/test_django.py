@@ -1,12 +1,11 @@
 from unittest.mock import MagicMock, patch
-from pytest import MonkeyPatch
-from django.core.handlers.exception import (
-    response_for_exception,
-    get_exception_response,
-)
+
 import django
-from errlypy.integrations.integration import IntegrationImpl
-from errlypy.integrations.django import DjangoIntegrationPlugin
+from django.core.handlers.exception import get_exception_response, response_for_exception
+from pytest import MonkeyPatch
+
+from errlypy.django.plugin import DjangoIntegrationPlugin
+from errlypy.lib import IntegrationImpl
 
 
 def get_resolver_mock(*args):
@@ -35,9 +34,7 @@ def test_response_for_exception_trigger():
     mpatch.setattr(django.core.handlers.exception, "get_resolver", get_resolver_mock)
     mpatch.setattr(django.core.handlers.exception, "settings", get_settings_mock())
 
-    with patch.object(
-        django_plugin, "__call__", wraps=django_plugin.__call__
-    ) as wrapped_call:
+    with patch.object(django_plugin, "__call__", wraps=django_plugin.__call__) as wrapped_call:
         response_for_exception(request, exc)
 
         wrapped_call.call_count == 1
@@ -65,9 +62,7 @@ def test_get_exception_response_trigger():
     mpatch = MonkeyPatch()
     mpatch.setattr(django.core.handlers.exception, "settings", get_settings_mock())
 
-    with patch.object(
-        django_plugin, "__call__", wraps=django_plugin.__call__
-    ) as wrapped_call:
+    with patch.object(django_plugin, "__call__", wraps=django_plugin.__call__) as wrapped_call:
         try:
             get_exception_response(request, resolver, status_code, exc)
         except Exception:
