@@ -53,7 +53,10 @@ class IntegrationImpl(Integration):
 class Errly:
     @classmethod
     def init(
-        cls, *, integration=get_integration_impl_singleton(), plugins: List[IntegrationPlugin]
+        cls,
+        *,
+        integration=get_integration_impl_singleton(),
+        plugins: List[IntegrationPlugin],
     ):
         integration.register(plugins)
         integration.setup()
