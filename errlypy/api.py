@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import OrderedDict
 from types import TracebackType
-from typing import Any, Optional, Type
+from typing import Any, Dict, Optional, Type, List
 
 
 class ExceptionCallback(ABC):
@@ -17,7 +17,7 @@ class ExceptionCallback(ABC):
         exc_type: Type[BaseException],
         exc_value: BaseException,
         exc_traceback: Optional[TracebackType],
-    ):
+    ) -> Dict[str, Any]:
         pass
 
 
@@ -33,7 +33,7 @@ class Extractor(ABC):
         pass
 
 
-class IntegrationPlugin(ABC):
+class Plugin(ABC):
     @abstractmethod
     def setup(self) -> None:
         pass
@@ -47,18 +47,20 @@ class IntegrationPlugin(ABC):
         pass
 
 
-class Integration(ABC):
-    _registry: OrderedDict[type, IntegrationPlugin]
-    _has_setup_been_called: bool
+class UninitializedPluginController(ABC):
+    @staticmethod
+    @abstractmethod
+    def init(plugins: List[Plugin]) -> "PluginController":
+        pass
+
+
+class PluginController(ABC):
+    _registry: OrderedDict[type, Plugin]
 
     @abstractmethod
     def register(self, *args) -> None:
         pass
 
     @abstractmethod
-    def setup(self) -> None:
-        pass
-
-    @abstractmethod
-    def revert(self) -> None:
+    def revert(self) -> UninitializedPluginController:
         pass

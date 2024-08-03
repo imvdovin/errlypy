@@ -2,7 +2,7 @@ import sys
 import traceback
 from dataclasses import dataclass
 from types import TracebackType
-from typing import Any, Optional, Type, cast
+from typing import Any, Dict, Optional, Type, cast
 
 from errlypy.api import ExceptionCallback, ExceptionCallbackWithContext, Extractor
 from errlypy.connection.http import HTTPConnection
@@ -22,7 +22,7 @@ class FrameDetail:
     function: str
     lineno: Optional[int]
     line: Optional[str]
-    locals: Optional[dict[str, str]]
+    locals: Optional[Dict[str, str]]
 
 
 class FrameExtractor(Extractor):
@@ -37,12 +37,12 @@ class FrameExtractor(Extractor):
 
 
 class BaseExceptionCallbackImpl(ExceptionCallback):
-    _context: dict[str, Any]
+    _context: Dict[str, Any]
     _meta: CreateExceptionCallbackMeta
 
     @classmethod
     def create(
-        cls, context: dict[str, Any] = dict(), meta=CreateExceptionCallbackMeta()
+        cls, context: Dict[str, Any] = dict(), meta=CreateExceptionCallbackMeta()
     ) -> "BaseExceptionCallbackImpl":
         instance = cls()
         instance._context = context
@@ -61,9 +61,9 @@ class ExceptionCallbackImpl(BaseExceptionCallbackImpl):
         exc_type: Type[BaseException],
         exc_value: BaseException,
         exc_traceback: Optional[TracebackType],
-    ):
+    ) -> Dict[str, Any]:
         # TODO: Create dataclass for response
-        response: dict[str, Any] = {
+        response: Dict[str, Any] = {
             "data": [],
         }
         python_lib_paths = sys.prefix, sys.base_prefix
@@ -76,7 +76,11 @@ class ExceptionCallbackImpl(BaseExceptionCallbackImpl):
 
         for frame in frames:
             has_lib_path = next(
-                (True for lib_path in python_lib_paths if frame.filename.startswith(lib_path)),
+                (
+                    True
+                    for lib_path in python_lib_paths
+                    if frame.filename.startswith(lib_path)
+                ),
                 False,
             )
 
@@ -88,9 +92,13 @@ class ExceptionCallbackImpl(BaseExceptionCallbackImpl):
         if self._next_callback is None:
             return response
 
-        if has_contract_been_implemented(self._next_callback, ExceptionCallbackWithContext):
-            self._next_callback = cast(ExceptionCallbackWithContext, self._next_callback)
+        if has_contract_been_implemented(
+            self._next_callback, ExceptionCallbackWithContext
+        ):
+            self._next_callback = cast(
+                ExceptionCallbackWithContext, self._next_callback
+            )
             # TODO: Create dataclass for context
             self._next_callback.set_context(response)
 
-        self._next_callback(exc_type, exc_value, exc_traceback)
+        return self._next_callback(exc_type, exc_value, exc_traceback)

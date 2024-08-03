@@ -7,7 +7,9 @@ import traceback
 
 class StackSummaryWrapper(traceback.StackSummary):
     @classmethod
-    def extract(klass, frame_gen, *, limit=None, lookup_lines=True, capture_locals=True):
+    def extract(
+        klass, frame_gen, *, limit=None, lookup_lines=True, capture_locals=True
+    ):
         def extended_frame_gen():
             for f, lineno in frame_gen:
                 yield f, lineno

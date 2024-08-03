@@ -2,11 +2,11 @@ import sys
 from types import TracebackType
 from typing import Optional, Type
 
-from errlypy.api import IntegrationPlugin
+from errlypy.api import Plugin
 from errlypy.exception.callback import ExceptionCallbackImpl
 
 
-class ExceptHookIntegrationPlugin(IntegrationPlugin):
+class ExceptHookPlugin(Plugin):
     def setup(self):
         sys.excepthook = self
 

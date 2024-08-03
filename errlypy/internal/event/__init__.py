@@ -2,7 +2,7 @@ import asyncio
 import asyncio.coroutines
 import inspect
 from dataclasses import dataclass
-from typing import Any, Callable, Coroutine, Generic, List, TypeVar, Union
+from typing import Any, Callable, Coroutine, Dict, Generic, List, Type, TypeVar, Union
 from uuid import UUID, uuid4
 
 
@@ -12,6 +12,7 @@ class Event:
 
 
 T = TypeVar("T")
+E = TypeVar("E", bound=Event)
 
 
 class EventType(Generic[T]):
@@ -20,10 +21,16 @@ class EventType(Generic[T]):
             Union[Callable[[T], None], Callable[[T], Coroutine[Any, Any, None]]]
         ] = []
 
-    def subscribe(self, callback: Callable[[T], None]) -> None:
+    def subscribe(
+        self,
+        callback: Union[Callable[[T], None], Callable[[T], Coroutine[Any, Any, None]]],
+    ) -> None:
         self._subscribers.append(callback)
 
-    def unsubscribe(self, callback: Callable[[T], None]) -> None:
+    def unsubscribe(
+        self,
+        callback: Union[Callable[[T], None], Callable[[T], Coroutine[Any, Any, None]]],
+    ) -> None:
         self._subscribers.remove(callback)
 
     def notify(self, message: T) -> None:
@@ -40,3 +47,13 @@ class EventType(Generic[T]):
                     asyncio.run(subscriber(message))
             else:
                 subscriber(message)
+
+
+class EventTypeFactory:
+    _instances: Dict[Type, EventType] = {}
+
+    @classmethod
+    def get(cls, event_type: Type[E]) -> EventType[E]:
+        if event_type not in cls._instances:
+            cls._instances[event_type] = EventType[E]()
+        return cls._instances[event_type]
