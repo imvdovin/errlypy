@@ -4,9 +4,9 @@ from typing import List, Optional
 from uuid import uuid4
 
 from errlypy.api import Plugin, PluginController, UninitializedPluginController
-from errlypy.internal.event.type import EventType
 from errlypy.internal.event.on_plugin_destroyed import OnPluginDestroyedEvent
 from errlypy.internal.event.on_plugin_initialized import OnPluginInitializedEvent
+from errlypy.internal.event.type import EventType
 
 
 @lru_cache

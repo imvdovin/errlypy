@@ -1,6 +1,7 @@
 import aiohttp
-from errlypy.django.events import OnDjangoExceptionHasBeenParsedEvent
+
 from errlypy.client.urllib import URLLibClient
+from errlypy.django.events import OnDjangoExceptionHasBeenParsedEvent
 from errlypy.internal.config import HTTPErrorConfig
 
 
