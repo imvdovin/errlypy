@@ -1,12 +1,16 @@
 import asyncio
+from uuid import uuid4
+
 import pytest
-from errlypy.internal.event import Event, EventType, EventTypeFactory
+
+from errlypy.internal.event import Event
+from errlypy.internal.event.type import EventType
 
 
 @pytest.mark.asyncio
 async def test_notify_with_multiple_async_subscribers():
     event_type = EventType[Event]()
-    event = Event()
+    event = Event(event_id=uuid4())
 
     results = []
 
@@ -40,7 +44,7 @@ async def test_notify_with_multiple_async_subscribers():
 @pytest.mark.asyncio
 async def test_notify_with_sync_and_multiple_async_subscribers():
     event_type = EventType[Event]()
-    event = Event()
+    event = Event(event_id=uuid4())
 
     results = []
 
@@ -74,12 +78,3 @@ async def test_notify_with_sync_and_multiple_async_subscribers():
         "async_2",
         "async_1",
     ], "Async subscribers did not complete in expected order"
-
-
-def test_event_type_factory():
-    event_type = [
-        EventTypeFactory.get(EventType[Event]),
-        EventTypeFactory.get(EventType[Event]),
-    ]
-
-    assert event_type[0] is event_type[1]

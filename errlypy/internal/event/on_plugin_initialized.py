@@ -4,5 +4,5 @@ from errlypy.internal.event import Event
 
 
 @dataclass(frozen=True)
-class OnPluginInitEvent(Event):
+class OnPluginInitializedEvent(Event):
     pass

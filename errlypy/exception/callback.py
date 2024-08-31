@@ -8,6 +8,7 @@ from errlypy.api import ExceptionCallback, ExceptionCallbackWithContext, Extract
 from errlypy.connection.http import HTTPConnection
 from errlypy.exception.stack import StackSummaryWrapper
 from errlypy.utils import has_contract_been_implemented
+from errlypy.exception import FrameDetail, ParsedExceptionDto
 
 
 @dataclass(frozen=True)
@@ -16,17 +17,8 @@ class CreateExceptionCallbackMeta:
     connection: Optional[HTTPConnection] = None
 
 
-@dataclass(frozen=True)
-class FrameDetail:
-    filename: str
-    function: str
-    lineno: Optional[int]
-    line: Optional[str]
-    locals: Optional[Dict[str, str]]
-
-
 class FrameExtractor(Extractor):
-    def extract(self, raw_data: traceback.FrameSummary) -> Any:
+    def extract(self, raw_data: traceback.FrameSummary) -> FrameDetail:
         return FrameDetail(
             filename=raw_data.filename,
             function=raw_data.name,
@@ -61,11 +53,8 @@ class ExceptionCallbackImpl(BaseExceptionCallbackImpl):
         exc_type: Type[BaseException],
         exc_value: BaseException,
         exc_traceback: Optional[TracebackType],
-    ) -> Dict[str, Any]:
-        # TODO: Create dataclass for response
-        response: Dict[str, Any] = {
-            "data": [],
-        }
+    ) -> ParsedExceptionDto:
+        response = ParsedExceptionDto(error=str(exc_value))
         python_lib_paths = sys.prefix, sys.base_prefix
         frame_extractor = FrameExtractor()
 
@@ -87,7 +76,7 @@ class ExceptionCallbackImpl(BaseExceptionCallbackImpl):
             if has_lib_path:
                 continue
 
-            response["data"].append(frame_extractor.extract(frame))
+            response.frames.append(frame_extractor.extract(frame))
 
         if self._next_callback is None:
             return response

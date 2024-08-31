@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import django
+import pytest
 from django.core.handlers.exception import (
     get_exception_response,
     response_for_exception,
@@ -8,7 +9,14 @@ from django.core.handlers.exception import (
 from pytest import MonkeyPatch
 
 from errlypy.django.plugin import DjangoExceptionPlugin
+from errlypy.django.events import OnDjangoExceptionHasBeenParsedEvent
+from errlypy.internal.event.type import EventType
 from errlypy.lib import UninitializedPluginControllerImpl
+
+
+@pytest.fixture
+def on_exc_parsed_fixture():
+    return EventType[OnDjangoExceptionHasBeenParsedEvent]()
 
 
 def get_resolver_mock(*args):
@@ -23,11 +31,11 @@ def get_settings_mock(*args, env={}, **kwargs):
     return mock
 
 
-def test_response_for_exception_trigger():
+def test_response_for_exception_trigger(on_exc_parsed_fixture):
     request = MagicMock()
     exc = Exception("Test")
 
-    django_plugin = DjangoExceptionPlugin()
+    django_plugin = DjangoExceptionPlugin(on_exc_parsed_fixture)
     UninitializedPluginControllerImpl.init(plugins=[django_plugin])
 
     mpatch = MonkeyPatch()
@@ -44,7 +52,7 @@ def test_response_for_exception_trigger():
     mpatch.undo()
 
 
-def test_get_exception_response_trigger():
+def test_get_exception_response_trigger(on_exc_parsed_fixture):
     request = MagicMock()
     resolver = MagicMock()
 
@@ -55,7 +63,7 @@ def test_get_exception_response_trigger():
     status_code = 500
     exc = Exception("Test")
 
-    django_plugin = DjangoExceptionPlugin()
+    django_plugin = DjangoExceptionPlugin(on_exc_parsed_fixture)
     UninitializedPluginControllerImpl.init(plugins=[django_plugin])
 
     mpatch = MonkeyPatch()

@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 from collections import OrderedDict
 from types import TracebackType
-from typing import Any, Dict, Optional, Type, List
+from typing import Any, List, Optional, Type
+
+from errlypy.exception import ParsedExceptionDto
 
 
 class ExceptionCallback(ABC):
@@ -17,13 +19,13 @@ class ExceptionCallback(ABC):
         exc_type: Type[BaseException],
         exc_value: BaseException,
         exc_traceback: Optional[TracebackType],
-    ) -> Dict[str, Any]:
+    ) -> ParsedExceptionDto:
         pass
 
 
 class ExceptionCallbackWithContext(ExceptionCallback):
     @abstractmethod
-    def set_context(self, data: dict[str, Any]) -> None:
+    def set_context(self, data: ParsedExceptionDto) -> None:
         pass
 
 

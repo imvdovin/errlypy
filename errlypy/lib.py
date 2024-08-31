@@ -1,11 +1,12 @@
 from collections import OrderedDict
 from functools import lru_cache, singledispatchmethod
 from typing import List, Optional
+from uuid import uuid4
 
-from errlypy.api import PluginController, Plugin, UninitializedPluginController
-from errlypy.internal.event import EventType
-from errlypy.internal.event.on_plugin_init import OnPluginInitEvent
-from errlypy.internal.event.on_plugin_destroy import OnPluginDestroyEvent
+from errlypy.api import Plugin, PluginController, UninitializedPluginController
+from errlypy.internal.event.type import EventType
+from errlypy.internal.event.on_plugin_destroyed import OnPluginDestroyedEvent
+from errlypy.internal.event.on_plugin_initialized import OnPluginInitializedEvent
 
 
 @lru_cache
@@ -18,17 +19,21 @@ def get_plugin_controller_singleton() -> "PluginController":
     return PluginControllerImpl()
 
 
-class UninitializedPluginControllerImpl(UninitializedPluginController):
+class UninitializedPluginControllerImpl(
+    UninitializedPluginController,
+):
     @staticmethod
     def init(plugins: List[Plugin]) -> PluginController:
         plugin_controller = PluginControllerImpl()
         plugin_controller.register(plugins)
 
-        plugin_init_event = EventType[OnPluginInitEvent]()
-        plugin_init_event.notify(OnPluginInitEvent())
+        on_initialized_event_instance = EventType[OnPluginInitializedEvent]()
 
         for plugin in plugin_controller.registry.values():
             plugin.setup()
+            on_initialized_event_instance.notify(
+                OnPluginInitializedEvent(event_id=uuid4()),
+            )
 
         return plugin_controller
 
@@ -51,11 +56,13 @@ class PluginControllerImpl(PluginController):
             self._set_registry(type(plugin), plugin)
 
     def revert(self) -> UninitializedPluginController:
-        plugin_destroy_event = EventType[OnPluginDestroyEvent]()
-        plugin_destroy_event.notify(OnPluginDestroyEvent())
+        on_destroyed_event_instance = EventType[OnPluginDestroyedEvent]()
 
         for plugin in self.registry.values():
             plugin.revert()
+            on_destroyed_event_instance.notify(
+                OnPluginDestroyedEvent(event_id=uuid4()),
+            )
 
         return UninitializedPluginControllerImpl()
 

@@ -6,6 +6,7 @@ from typing import NoReturn, cast
 from pytest import MonkeyPatch
 
 from errlypy.api import ExceptionCallback
+from errlypy.exception import ParsedExceptionDto
 from errlypy.exception.callback import (
     CreateExceptionCallbackMeta,
     ExceptionCallbackImpl,
@@ -56,10 +57,10 @@ def test_exception_callback_impl_result_success():
     except ValueError as err:
         result = sys.excepthook(type(err), err, err.__traceback__)
 
-    assert isinstance(result, dict)
-    assert isinstance(result["data"], list)
-    assert len(result["data"]) > 0
-    assert isinstance(result["data"][0], FrameDetail)
+    assert isinstance(result, ParsedExceptionDto)
+    assert isinstance(result.frames, list)
+    assert len(result.frames) > 0
+    assert isinstance(result.frames[0], FrameDetail)
 
 
 def test_exception_callback_impl_result_frame_detail_contract_success():
@@ -72,7 +73,7 @@ def test_exception_callback_impl_result_frame_detail_contract_success():
     except ValueError as err:
         result = sys.excepthook(type(err), err, err.__traceback__)
 
-    frame_detail = result["data"][0]
+    frame_detail = result.frames[0]
     assert has_dict_contract_been_implemented(asdict(frame_detail), FrameDetail)
 
 
@@ -86,7 +87,7 @@ def test_exception_callback_impl_result_frame_detail_body_success():
     except ValueError as err:
         result = sys.excepthook(type(err), err, err.__traceback__)
 
-    frame_detail = cast(FrameDetail, result["data"][0])
+    frame_detail = cast(FrameDetail, result.frames[0])
     assert (
         frame_detail.function
         == "test_exception_callback_impl_result_frame_detail_body_success"
@@ -112,4 +113,4 @@ def test_exception_callback_impl_with_invalid_repr_result_frame_detail_body_succ
     except ValueError as err:
         result = sys.excepthook(type(err), err, err.__traceback__)
 
-    assert len(result["data"]) == 0
+    assert len(result.frames) == 0

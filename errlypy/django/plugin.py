@@ -1,16 +1,26 @@
 from types import TracebackType
-from typing import Any, Type, Tuple
+from typing import Any, Tuple, Type
 
 from django.core.handlers import exception
 
 from errlypy.api import Plugin
-from errlypy.internal.event import EventTypeFactory
-from errlypy.internal.observable import Observable
 from errlypy.django.events import OnDjangoExceptionHasBeenParsedEvent
 from errlypy.exception.callback import ExceptionCallbackImpl
+from errlypy.internal.event.type import EventType
+from uuid import uuid4
 
 
-class DjangoExceptionPlugin(Plugin, Observable):
+class DjangoExceptionPlugin(Plugin):
+    def __init__(
+        self,
+        on_exc_has_been_parsed_event_instance: EventType[
+            OnDjangoExceptionHasBeenParsedEvent
+        ],
+    ) -> None:
+        self._on_exc_has_been_parsed_event_instance = (
+            on_exc_has_been_parsed_event_instance
+        )
+
     def setup(self):
         self._callback = ExceptionCallbackImpl.create()
         self._original_fn = exception.handle_uncaught_exception
@@ -27,9 +37,8 @@ class DjangoExceptionPlugin(Plugin, Observable):
     ) -> Any:
         response = self._callback(exc_info[0], exc_info[1], exc_info[2])
 
-        self.notify(
-            EventTypeFactory.get(OnDjangoExceptionHasBeenParsedEvent),
-            response,
+        self._on_exc_has_been_parsed_event_instance.notify(
+            OnDjangoExceptionHasBeenParsedEvent(event_id=uuid4(), data=response),
         )
 
         return self._original_fn(request, resolver, exc_info)
