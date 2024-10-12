@@ -23,4 +23,24 @@ from . import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("view-zero-division/", views.view_zero_division, name="view_zero_division"),
+    path(
+        "async-view-zero-division",
+        views.async_view_zero_division,
+        name="async_view_zero_division",
+    ),
+    path(
+        "async-view-zero-division-sleep-3-sec",
+        views.async_view_zero_division_sleep_3_sec,
+        name="async_view_zero_division_sleep_3_sec",
+    ),
+    path(
+        "async-view-ok",
+        views.async_view_ok,
+        name="async_view_ok",
+    ),
+    path(
+        "async-view-ok-sleep-3-sec",
+        views.async_view_ok_sleep_3_sec,
+        name="async_view_ok_sleep_3_sec",
+    ),
 ]
